@@ -12,7 +12,7 @@ public class SVGPath: SVGShape, ObservableObject {
     }
 
     override public func frame() -> CGRect {
-        toBezierPath().cgPath.boundingBoxOfPath
+        toBezierPath().cgPath.boundingBox
     }
 
     override public func bounds() -> CGRect {
