@@ -40,12 +40,50 @@ struct SVGPathView: View {
     }
 }
 
+extension MBezierPath: @unchecked Sendable {
+    
+}
+
+extension CGFloat: @unchecked Sendable {
+    
+}
+
+struct SVGPathShapeView: Shape {
+    let path: MBezierPath
+    
+    func path(in rect: CGRect) -> Path {
+        let pathBounds = path.cgPath.boundingBox
+        
+        let scaleFactor: CGFloat
+        if pathBounds.size.isLandscape {
+            scaleFactor = rect.width / pathBounds.size.width
+        } else {
+            scaleFactor = rect.height / pathBounds.size.height
+        }
+        
+        let T = CGAffineTransform(scaleX: scaleFactor, y: scaleFactor)
+        path.apply(T)
+        
+        return Path(path.cgPath)
+    }
+}
+
+extension CGSize {
+    var isPortrait: Bool {
+        width < height
+    }
+    
+    var isLandscape: Bool {
+        !isPortrait
+    }
+}
+
 extension MBezierPath {
 
     func toSwiftUI(model: SVGShape, eoFill: Bool = false) -> some View {
         let isGradient = model.fill is SVGGradient
         let bounds = isGradient ? model.bounds() : CGRect.zero
-        return Path(self.cgPath)
+        return SVGPathShapeView(path: self)
             .applySVGStroke(stroke: model.stroke, eoFill: eoFill)
             .applyShapeAttributes(model: model)
             .applyIf(isGradient) {
