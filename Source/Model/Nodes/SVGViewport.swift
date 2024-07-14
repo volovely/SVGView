@@ -66,7 +66,7 @@ struct SVGViewportView: View {
             let size = geometry.size
             let viewBox = getViewBox(size: size)
             SVGGroupView(model: model)
-                .transformEffect(getTransform(viewBox: viewBox, size: size))
+                // .transformEffect(getTransform(viewBox: viewBox, size: size))
         }
         .frame(idealWidth: model.width.ideal, idealHeight: model.height.ideal)
         .clipped()
