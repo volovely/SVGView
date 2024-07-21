@@ -47,6 +47,7 @@ struct SVGRectView: View {
 
     public var body: some View {
         RoundedRectangle(cornerSize: CGSize(width: model.rx, height: model.ry))
+            .transform(model.originTransform)
             .applySVGStroke(stroke: model.stroke)
             .applyShapeAttributes(model: model)
             .frame(width: model.width, height: model.height)

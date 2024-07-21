@@ -36,7 +36,10 @@ struct SVGPathView: View {
     @ObservedObject var model = SVGPath()
 
     public var body: some View {
-        model.toBezierPath().toSwiftUI(model: model, eoFill: model.fillRule == .evenOdd)
+        let bPath = model.toBezierPath()
+        bPath.apply(model.originTransform)
+        
+        return bPath.toSwiftUI(model: model, eoFill: model.fillRule == .evenOdd)
     }
 }
 

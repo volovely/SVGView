@@ -41,7 +41,10 @@ struct SVGLineView: View {
     @ObservedObject var model = SVGLine()
 
     public var body: some View {
-        line.toSwiftUI(model: model)
+        let bPath = line
+        line.apply(model.originTransform)
+        
+        return line.toSwiftUI(model: model)
     }
 
     private var line: MBezierPath {

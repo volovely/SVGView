@@ -35,6 +35,7 @@ struct SVGEllipseView: View {
 
     public var body: some View {
         Ellipse()
+            .transform(model.originTransform)
             .applySVGStroke(stroke: model.stroke)
             .frame(width: 2 * model.rx, height: 2 * model.ry)
             .position(x: model.cx, y: model.cy)

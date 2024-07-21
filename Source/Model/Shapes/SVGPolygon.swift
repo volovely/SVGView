@@ -68,6 +68,7 @@ struct SVGPolygonView: View {
             path.addLine(to: CGPoint(x: point.x, y: point.y))
         }
         path.close()
+        path.apply(model.originTransform)
         return path
     }
 }

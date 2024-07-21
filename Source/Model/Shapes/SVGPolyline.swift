@@ -66,6 +66,7 @@ struct SVGPolylineView: View {
             let point = model.points[i]
             path.addLine(to: CGPoint(x: point.x, y: point.y))
         }
+        path.apply(model.originTransform)
         return path
     }
 }

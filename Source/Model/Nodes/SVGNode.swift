@@ -9,7 +9,8 @@ public class SVGNode: SerializableElement {
     @Published public var clip: SVGNode?
     @Published public var mask: SVGNode?
     @Published public var id: String?
-
+    @Published public var originTransform: CGAffineTransform = CGAffineTransform.identity
+    
     var gestures = [AnyGesture<()>]()
 
     public init(transform: CGAffineTransform = .identity, opaque: Bool = true, opacity: Double = 1, clip: SVGNode? = nil, mask: SVGNode? = nil, id: String? = nil) {
