@@ -65,7 +65,14 @@ extension SVGView {
             return nil
         }
         
-        if let sizeToFit = sizeToFit, let viewBox = viewPort.viewBox {
+        if let sizeToFit = sizeToFit {
+            let viewBox = viewPort.viewBox ?? CGRect(
+                origin: .zero,
+                size: CGSize(
+                    width: viewPort.width.toPixels(total: sizeToFit.width),
+                    height: viewPort.height.toPixels(total: sizeToFit.height)
+                )
+            )
             let newViewBox = CGRect(origin: .zero, size: sizeToFit)
             let t = viewBox.transform(toFit: newViewBox)
             
@@ -124,17 +131,14 @@ extension SVGNode {
 }
 
 extension CGRect {
-    // TODO: Add other ratios if needed
     func transform(toFit rectToFit: CGRect) -> CGAffineTransform {
-        guard self.origin != .zero else { return .identity }
-        
         let t = self.aspectFitTransform(toFit: rectToFit)
         
         return t
     }
     
     func aspectFitTransform(toFit targetRect: CGRect) -> CGAffineTransform {
-
+        
         let scaleX = targetRect.width / self.width
         let scaleY = targetRect.height / self.height
         let scale = min(scaleX, scaleY)
@@ -153,6 +157,11 @@ extension CGRect {
                 )
                 .scaledBy(x: scale, y: scale)
             )
+        
+//        let transform = CGAffineTransform(translationX: -self.minX, y: -self.minY) // Aligning origin
+//            .concatenating( // Scaling is happening around the canter, so we need compensate offset
+//                CGAffineTransform(scaleX: scale, y: scale)
+//            )
         
         return transform
     }
