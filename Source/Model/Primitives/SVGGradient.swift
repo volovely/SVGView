@@ -54,15 +54,38 @@ public class SVGLinearGradient: SVGGradient {
             stops: stops
         )
     }
-
-    public func toSwiftUI(rect: CGRect) -> LinearGradient {
+    public func toSwiftUI(rect: CGRect, model: SVGShape? = nil) -> LinearGradient {
+        var initTransform = false
+        var x1 = self.x1
+        var y1 = self.y1
+        var x2 = self.x2
+        var y2 = self.y2
+        var rect = rect
+        
+        if let t = model?.originTransform, t != .identity {
+            let start = CGPoint(x: x1, y: y1)
+            let end = CGPoint(x: x2, y: y2)
+            
+            let trStart = start.applying(t)
+            let trEnd = end.applying(t)
+            let trRect = rect.applying(t)
+            
+            x1 = trStart.x
+            y1 = trStart.y
+            x2 = trEnd.x
+            y2 = trEnd.y
+            rect = trRect
+            initTransform = true
+            
+        }
+        
         let suiStops = stops.map { stop in Gradient.Stop(color: stop.color.toSwiftUI(), location: stop.offset) }
-        let nx1 = userSpace ? (x1 - rect.minX) / rect.size.width : x1
-        let ny1 = userSpace ? (y1 - rect.minY) / rect.size.height : y1
-        let nx2 = userSpace ? (x2 - rect.minX) / rect.size.width : x2
-        let ny2 = userSpace ? (y2 - rect.minY) / rect.size.height : y2
-        return LinearGradient(gradient: Gradient(stops: suiStops), startPoint: UnitPoint(x: nx1, y: ny1), endPoint: UnitPoint(x: nx2, y: ny2)
-        )
+        let nx1 = !initTransform ? (x1 - rect.minX) / rect.size.width : x1
+        let ny1 = !initTransform ? (y1 - rect.minY) / rect.size.height : y1
+        let nx2 = !initTransform ? (x2 - rect.minX) / rect.size.width : x2
+        let ny2 = !initTransform ? (y2 - rect.minY) / rect.size.height : y2
+        let res = LinearGradient(gradient: Gradient(stops: suiStops), startPoint: UnitPoint(x: nx1, y: y1), endPoint: UnitPoint(x: nx2, y: y2))
+        return res
     }
 
     func apply<S>(view: S, model: SVGShape? = nil) -> some View where S : View {
@@ -75,14 +98,15 @@ public class SVGLinearGradient: SVGGradient {
         return view
             .foregroundColor(.clear)
             .overlay(
-                toSwiftUI(rect: frame)
-                    .applyIf(!userSpace) {
-                        $0.frame(width: maximum, height: maximum)
-                            .scaleEffect(CGSize(width: width/maximum, height: height/maximum))
-                    }
-                    .frame(width: width, height: height)
+                toSwiftUI(rect: frame, model: model)
+                    .scaleEffect(CGSize(width: width/maximum, height: height/maximum))
+//                                    .applyIf(!userSpace) {
+//                                        $0.frame(width: maximum, height: maximum)
+//                                            .scaleEffect(CGSize(width: width/maximum, height: height/maximum))
+//                                    }
+                    //.frame(width: width, height: height)
                     .offset(x: bounds.minX, y: bounds.minY)
-                    .mask(view)
+                    //.mask(view)
             )
     }
 
